@@ -16,3 +16,19 @@ just run # run vivado simulation
 just app # build the baremetal demo application ( you need docker for this )
 just mif_replace # backup existing mif file and replace it with the new one from app command
 ```
+
+### requirements
+
+1. have docker installed
+2. just command runner
+   you can use the following command. replace `DEST` with where you want to install it. `$HOME/.local/bin` is recommended. but if you don't have that in `$PATH` already use some path that you already have in `$PATH`
+
+   ```bash
+   # !!! replace DEST with your path
+   curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to DEST
+
+   # the following command download and move to $HOME/.local/bin
+   curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to $HOME/.local/bin
+   ```
+
+3. gh cli tool: https://cli.github.com/
