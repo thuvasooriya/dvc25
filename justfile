@@ -3,13 +3,16 @@ app:
     cd APPLICATION
     echo "{{ BLUE }}[i] checking for docker..{{ NORMAL }}"
     ./docker_scripts/install_and_load_docker.sh
-    docker run -it --rm -v $(pwd)/../../cdac:/mnt/dvcon dvcon_2 sh -c "cd /mnt/dvcon && cd APPLICATION && ./docker_scripts/sim_app_compile.sh"
+    docker run -it --rm \
+    -v "{{ source_directory() }}:/mnt/dvcon" \
+    dvcon_2 \
+    sh -c "cd /mnt/dvcon && cd APPLICATION && ./docker_scripts/sim_app_compile.sh"
     # sudo chown -R $USER:$USER demo
 
 run:
     #!/bin/bash
     export MDIR_PATH="{{ source_directory() }}"
-    export SIM_RUN_TIME="1000"
+    export SIM_RUN_TIME="1000" # in ns
     ./RUN/run.sh
 
 mif_replace:
