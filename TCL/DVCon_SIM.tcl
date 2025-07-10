@@ -38,16 +38,20 @@ add_files $MDIR_PATH/DVCon_SoC_SRC/AT1051_SYSTEM/AT1051_SYSTEM_TOP.v $MDIR_PATH/
 add_files $MDIR_PATH/DVCon_SoC_SRC/TB/test_bench.vhd
 add_files $MDIR_PATH/DVCon_SoC_SRC/MEMORY_IP/rom_32KB_axi/rom_32KB_axi.xci
 
-##------- Add design source files [Accelerator] ---------------
+# ++ Add new Gemma3 Accelerator IP source files ++
+set ACC_IP_PATH "$MDIR_PATH/DVCon_SoC_SRC/ACC_IP_NEW"
 
-add_files -norecurse $MDIR_PATH/DVCon_SoC_SRC/ACCELERATOR_IP/Accelerator_Top.vhd
-#add_files -norecurse $MDIR_PATH/DVCon_SoC_SRC/ACCELERATOR_IP/Accelerator_Top.v
+# Add the VHDL Wrapper
+add_files -norecurse [glob $ACC_IP_PATH/accelerator_top.vhd]
 
-add_files $MDIR_PATH/DVCon_SoC_SRC/ACCELERATOR_IP/axi_acc_dwidth_converter_0/axi_acc_dwidth_converter_0.xci
-
-add_files $MDIR_PATH/DVCon_SoC_SRC/ACCELERATOR_IP/matrix_multiply_64.v
-
-##-------------------------------------------------------------
+# Add the Verilog cores
+add_files -norecurse [glob $ACC_IP_PATH/pe_int8.v]
+add_files -norecurse [glob $ACC_IP_PATH/accelerator_buffer.v]
+add_files -norecurse [glob $ACC_IP_PATH/output_processor.v]
+add_files -norecurse [glob $ACC_IP_PATH/dequant_engine.v]
+add_files -norecurse [glob $ACC_IP_PATH/systolic_array_16x16.v]
+add_files -norecurse [glob $ACC_IP_PATH/gemma_accelerator.v]
+# ----------------------------------------------
 
 update_compile_order -fileset sources_1
 set_property top test_bench [get_filesets sim_1]
