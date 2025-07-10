@@ -1,0 +1,9 @@
+/tmp/*
+/VIVADO_PROJECT/*
+vivado**.jou
+vivado**.log
+vivado**.str
+/APPLICATION/demo/build
+/APPLICATION/toolchain-bare
+/APPLICATION/docker_scripts/docker.tar
+/RUN/backups/*
