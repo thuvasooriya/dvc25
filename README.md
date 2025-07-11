@@ -1,28 +1,33 @@
 ## dvcon25 workflow
 
-install just command runner
-https://github.com/casey/just
-
-the first time you clone the repo you wont have the required toolchain and docker image.
-
-you should have access to the private repo and setup the authentication with gh cli tool before this inorder to download the files seamlessly. or you'll have to manually go to the repo download the files from relases and place them in the required places.
-
-if you have gh cli installed and authenticated then run `just setup` to download the required files and set them up in the required places.
+> [!IMPORTANT]
+> you should have access to the private repo and setup the authentication with gh cli tool before this inorder to download the files seamlessly. or you'll have to manually go to the repo download the files from relases and place them in the required places.
 
 > [!NOTE]
+> if you have gh cli installed and authenticated then run `just setup` to download the required files and set them up in the required places.
 > `just setup` downloads and places 2 important files for the workflow. if you couldn't complete the setup command for some reason, you can manually download them from thr releases (check justfile for links) and place them in the required places.
 
 now you can use the following commands
 
 ```bash
+# gemma_accelerator workflow
+    compile_app                 # compile the application
+    run sim_time_us='1000'      # run the simulation in gui
+    sim sim_time_us='1000'      # run vivado simulation in batch mode - no gui
+    stage_files                 # update RUN/rom_32KB_axi.mif
+    start                       # whole workflow from app compilation to gui sim
+
+# cdac_matmul64_accelerator workflow
+    cdac_compile_app            # compile the application
+    cdac_run sim_time_us='1000' # run the simulation in gui
+    cdac_sim sim_time_us='1000' # run vivado sim in batch mode for cdac acc
+    cdac_stage_files            # update RUN/rom_32KB_axi.mif
+    cdac_start
+
+# helper commands
+    setup                       # initialize the required files
+    help                        # list all commands
     clean
-    compile_app            # compile the application
-    help                   # list all commands
-    run sim_time_us='1000' # run the simulation in gui [alias: r]
-    setup                  # initialize the required files
-    sim sim_time_us='1000' # run vivado simulation in batch mode - no gui
-    stage_files            # update RUN/rom_32KB_axi.mif [alias: u]
-    start                  # whole workflow from app compilation to gui sim [alias: s]
 ```
 
 ### requirements
