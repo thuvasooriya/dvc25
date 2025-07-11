@@ -9,3 +9,4 @@
 /RUN/backups/*
 /DVCon_SoC_SRC/MEMORY_IP/rom_32KB_axi/backups/*
 /GEN_BIT_OUT/*.vcd
+**.bak
