@@ -9,6 +9,8 @@ echo "[i] bin2hex: $EXE_NAME"
 bin2hex --bit-width 128 build/$EXE_NAME.bin build/$EXE_NAME.hex
 echo "[i] hex2mif: $EXE_NAME"
 hex2mif.sh build/$EXE_NAME.hex
+echo "[i] hex2coe: $EXE_NAME"
+hex2coe.sh build/$EXE_NAME.hex build/$EXE_NAME.coe
 echo "[i] hex2mem: $EXE_NAME"
 hex2mem.sh build/$EXE_NAME.hex
 cp build/$EXE_NAME.hex.mem build/$EXE_NAME.mem

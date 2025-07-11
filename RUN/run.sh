@@ -1,87 +1,187 @@
 #!/bin/bash
 
-printf "\n"
-printf "\e[1;34m--------------------------\e[0m"
-printf "\e[1;34m|\e[1;32m!! Design & Verification Challenge !!\e[0m \e[1;34m|\e[0m"
-printf "\e[1;34m--------------------------\e[0m\n"
+# color definitions for cross-platform compatibility
+readonly CLEAR="\ec"
+readonly NORMAL="\e[0m"
+readonly BOLD="\e[1m"
+readonly ITALIC="\e[3m"
+readonly UNDERLINE="\e[4m"
+readonly INVERT="\e[7m"
+readonly HIDE="\e[8m"
+readonly STRIKETHROUGH="\e[9m"
+readonly BLACK="\e[30m"
+readonly RED="\e[31m"
+readonly GREEN="\e[32m"
+readonly YELLOW="\e[33m"
+readonly BLUE="\e[34m"
+readonly MAGENTA="\e[35m"
+readonly CYAN="\e[36m"
+readonly WHITE="\e[37m"
+readonly BG_BLACK="\e[40m"
+readonly BG_RED="\e[41m"
+readonly BG_GREEN="\e[42m"
+readonly BG_YELLOW="\e[43m"
+readonly BG_BLUE="\e[44m"
+readonly BG_MAGENTA="\e[45m"
+readonly BG_CYAN="\e[46m"
+readonly BG_WHITE="\e[47m"
 
-rm -rf *.log *.jou *.str .Xil unisims_ver work transcript modelsim.ini
+# configuration
+readonly SCRIPT_NAME="FPGA Project Tool"
+readonly TCL_DIR="$MDIR_PATH/TCL"
+readonly HSPACE=" "
 
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
+#============================================================================
+# utility functions
+#============================================================================
 
-# read -p $'\nWrite Your Main Directory Path:\n[ eg:- /home/Documents/DVCon_2025 ]\n> ' MDIR_PATH
-# export MDIR_PATH="/Users/tony/dev/dvcon25/cdac"
+print_header() {
+    printf "\n"
+    printf "${BLUE}${BOLD}=================================${NORMAL}\n"
+    printf "${BLUE}${BOLD}|${GREEN} $SCRIPT_NAME ${NORMAL}${BLUE}${BOLD}|${NORMAL}\n"
+    printf "${BLUE}${BOLD}=================================${NORMAL}\n"
+}
 
-if [ ! -d "$MDIR_PATH" ]; then
-    printf "\n${RED}directory does not exist. please check the path.${NC}"
-    exit 1
-fi
+print_separator() {
+    printf "${CYAN}-------------------------------------------${NORMAL}\n"
+}
 
-# sed -i "s|set MDIR_PATH \".*\"|set MDIR_PATH \"$MDIR_PATH\"|" "$MDIR_PATH/TCL/DVCon_SIM.tcl"
-# sed -i "s|set MDIR_PATH \".*\"|set MDIR_PATH \"$MDIR_PATH\"|" "$MDIR_PATH/TCL/DVCon_SYNTH.tcl"
-while true; do
-    printf "${GREEN}"
-    echo "==========================================="
-    echo " FPGA Project Tool Menu"
-    echo " Main Directory: $MDIR_PATH"
-    echo "==========================================="
-    echo "1) Vivado Simulation"
-    echo "2) FPGA Implementation"
-    echo "3) FPGA Programming"
-    echo "4) Exit"
-    echo "==========================================="
-    printf "${NC}"
-    read -p "Select an option [1-4]: " choice
+validate_environment() {
+    if [ ! -d "$MDIR_PATH" ]; then
+        printf "\n${RED}${BOLD}[✕] error: MDIR_PATH directory does not exist${NORMAL}\n"
+        printf "${RED}[!] please check the path: $MDIR_PATH${NORMAL}\n"
+        exit 1
+    fi
+
+    if [ ! -d "$TCL_DIR" ]; then
+        printf "\n${RED}${BOLD}[✕] error: TCL directory does not exist${NORMAL}\n"
+        printf "${RED}[!] please check the path: $TCL_DIR${NORMAL}\n"
+        exit 1
+    fi
+}
+
+cleanup_files() {
+    printf "${YELLOW}[*] cleaning up temporary files...${NORMAL}\n"
+    rm -rf *.log *.jou *.str .Xil unisims_ver work transcript modelsim.ini
+}
+
+run_vivado_script() {
+    local script_name=$1
+    local script_path="$TCL_DIR/$script_name"
+    local mode=$2
+
+    if [ ! -f "$script_path" ]; then
+        printf "${RED}[✕] error: script not found: $script_path${NORMAL}\n"
+        return 1
+    fi
+
+    printf "${GREEN}[+] executing: $script_name${NORMAL}\n"
+    if [ "$mode" = "batch" ]; then
+        vivado -mode batch -source "$script_path"
+    else
+        vivado -source "$script_path"
+    fi
+}
+
+show_not_implemented() {
+    printf "${RED}${BOLD}"
+    printf "\n =========================================="
+    printf "\n | [!] feature will be available soon... |"
+    printf "\n =========================================="
+    printf "${NORMAL}\n"
+}
+
+#============================================================================
+# main menu system
+#============================================================================
+
+display_menu() {
+    printf "\n"
+    printf "${BLUE}${BOLD}╔════════════════════════════════════════════════════════════════╗${NORMAL}\n"
+    printf "${BLUE}${BOLD}║                        DVCON 25 SYNTH-Z                        ║${NORMAL}\n"
+    printf "${BLUE}${BOLD}╚════════════════════════════════════════════════════════════════╝${NORMAL}\n"
+    printf "\n"
+    printf "  ${CYAN}[i] workspace: ${GREEN}$MDIR_PATH${NORMAL}\n"
+    printf "\n"
+
+    printf "${BLUE}${HSPACE}════════════════════════════════════════════════════════════════${NORMAL}\n"
+    printf "${BLUE}${BOLD}${HSPACE}SIMULATION${NORMAL}\n"
+    printf "${BLUE}${HSPACE}════════════════════════════════════════════════════════════════${NORMAL}\n"
+    printf "  ${YELLOW}[1]${NORMAL} fast simulation        ${CYAN}(non-project, console only)${NORMAL}\n"
+    printf "  ${YELLOW}[2]${NORMAL} batch simulation       ${CYAN}(project mode, no GUI)${NORMAL}\n"
+    printf "  ${YELLOW}[3]${NORMAL} GUI simulation         ${CYAN}(full GUI with waveforms)${NORMAL}\n"
+    printf "\n"
+
+    printf "${MAGENTA}${HSPACE}════════════════════════════════════════════════════════════════${NORMAL}\n"
+    printf "${MAGENTA}${BOLD}${HSPACE}IMPLEMENTATION${NORMAL}\n"
+    printf "${MAGENTA}${HSPACE}════════════════════════════════════════════════════════════════${NORMAL}\n"
+    printf "  ${YELLOW}[5]${NORMAL} synthesis only         ${CYAN}(quick synthesis check)${NORMAL}\n"
+    printf "  ${YELLOW}[6]${NORMAL} full implementation    ${CYAN}(synthesis + P&R + bitstream)${NORMAL}\n"
+    printf "\n"
+
+    printf "${GREEN}${HSPACE}════════════════════════════════════════════════════════════════${NORMAL}\n"
+    printf "${GREEN}${BOLD}${HSPACE}MISC${NORMAL}\n"
+    printf "${GREEN}${HSPACE}════════════════════════════════════════════════════════════════${NORMAL}\n"
+    printf "  ${YELLOW}[7]${NORMAL} programming            ${CYAN}(device programming)${NORMAL}\n"
+    printf "  ${YELLOW}[8]${NORMAL} clean & exit           ${CYAN}(cleanup and exit)${NORMAL}\n"
+    printf "\n"
+}
+
+process_choice() {
+    local choice=$1
 
     case $choice in
     1)
-        echo "Running Vivado Simulation..."
-        vivado -source $MDIR_PATH/TCL/DVCon_SIM.tcl
+        printf "\n${GREEN}[+] starting fast simulation...${NORMAL}\n"
+        printf "${CYAN}[*] features: non-project mode, console output only, fastest execution${NORMAL}\n"
+        run_vivado_script "sim_npm.tcl" "batch"
         ;;
     2)
-        echo ""
-        printf "${GREEN}"
-        echo "-------------------------------------------"
-        echo "      FPGA Implementation Options"
-        echo "-------------------------------------------"
-        printf "${NC}"
-        echo "  1)  Synthesis Only"
-        echo "  2)  Full Implementation (Synthesis + Implementation + Bitstream)"
-        echo "-------------------------------------------"
-        read -p "Enter your choice [1-2]: " imp_choice
-        echo ""
-        case $imp_choice in
-        1)
-            echo "Running Synthesis Only..."
-            vivado -mode batch -source $MDIR_PATH/TCL/DVCon_SYNTH.tcl
-            ;;
-        2)
-            printf "\e[1;31m"
-            printf "\n ----------------------------------------"
-            printf " |  Will provide in the Next Stage...!! |"
-            printf " ----------------------------------------"
-            printf "${NC}"
-            ;;
-        *)
-            echo "Invalid implementation option. Please choose 1 or 2."
-            ;;
-        esac
+        printf "\n${GREEN}[+] starting batch simulation...${NORMAL}\n"
+        printf "${CYAN}[*] features: project mode, no GUI, moderate speed${NORMAL}\n"
+        run_vivado_script "sim_nogui.tcl" "batch"
         ;;
     3)
-        printf "\e[1;31m"
-        printf "\n ----------------------------------------"
-        printf " |  Will provide in the Next Stage...!! |"
-        printf " ----------------------------------------"
-        printf "${NC}"
+        printf "\n${GREEN}[+] starting GUI simulation...${NORMAL}\n"
+        printf "${CYAN}[*] features: full GUI, waveform viewing, interactive debugging${NORMAL}\n"
+        run_vivado_script "DVCon_SIM.tcl" "gui"
         ;;
-    4)
-        echo "Exiting..."
-        break
+    5)
+        printf "\n${GREEN}[+] starting synthesis only...${NORMAL}\n"
+        printf "${CYAN}[*] features: quick synthesis check, no implementation${NORMAL}\n"
+        run_vivado_script "DVCon_SYNTH.tcl" "batch"
+        ;;
+    6)
+        printf "\n${GREEN}[+] starting full implementation...${NORMAL}\n"
+        show_not_implemented
+        ;;
+    7)
+        printf "\n${GREEN}[+] starting FPGA programming...${NORMAL}\n"
+        show_not_implemented
+        ;;
+    8)
+        printf "\n${GREEN}[+] cleaning up and exiting...${NORMAL}\n"
+        cleanup_files
+        printf "${GREEN}[✓] goodbye!${NORMAL}\n"
+        exit 0
         ;;
     *)
-        echo "Invalid option. Please choose between 1 and 4."
+        printf "\n${RED}[✕] invalid option. please choose between 1-8${NORMAL}\n"
         ;;
     esac
-    echo ""
-done
+}
+
+main() {
+    validate_environment
+
+    while true; do
+        display_menu
+        read -p "[*] select an option: " choice
+        process_choice "$choice"
+
+        printf "\n${YELLOW}[*] press enter to continue...${NORMAL}"
+        read -r
+    done
+}
+
+main "$@"
