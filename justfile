@@ -3,9 +3,10 @@ alias u := stage_files
 alias s := start
 
 # list all commands
-help:
+@help:
     just --list --list-heading ''
 
+# whole workflow from app compilation to gui sim
 start: clean setup stage_files run
 
 # run vivado simulation in batch mode - no gui

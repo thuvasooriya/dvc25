@@ -15,9 +15,14 @@ if you have gh cli installed and authenticated then run `just setup` to download
 now you can use the following commands
 
 ```bash
-just run # run vivado simulation
-just app # build the baremetal demo application ( you need docker for this )
-just mif_replace # backup existing mif file and replace it with the new one from app command
+    clean
+    compile_app            # compile the application
+    help                   # list all commands
+    run sim_time_us='1000' # run the simulation in gui [alias: r]
+    setup                  # initialize the required files
+    sim sim_time_us='1000' # run vivado simulation in batch mode - no gui
+    stage_files            # update RUN/rom_32KB_axi.mif [alias: u]
+    start                  # whole workflow from app compilation to gui sim [alias: s]
 ```
 
 ### requirements
@@ -58,10 +63,8 @@ just mif_replace # backup existing mif file and replace it with the new one from
 │       └── rom_32KB_axi/          # 32KB ROM IP core
 ├── TCL/
 │   ├── DVCon_SIM.tcl             # simulation script
+│   ├── sim_nogui.tcl             # batch mode simulation script
 │   └── DVCon_SYNTH.tcl           # synthesis script
-├── RUN/
-│   ├── run.sh                     # Original run script
-│   └── rom_32KB_axi.mif          # ROM initialization file
 ├── APPLICATION/                   # Software/firmware
 │   ├── demo/
 │   ├── toolchain-bare/            # Bare-metal toolchain
