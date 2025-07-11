@@ -29,7 +29,6 @@ if {[catch {import_ip $MDIR_PATH/DVCon_SoC_SRC/MEMORY_IP/rom_32KB_axi/rom_32KB_a
 
 add_files $MDIR_PATH/DVCon_SoC_SRC/AT1051_SYSTEM/AT1051_SYSTEM_TOP.v $MDIR_PATH/DVCon_SoC_SRC/TOP/Top.vhd
 add_files $MDIR_PATH/DVCon_SoC_SRC/TB/test_bench.vhd
-# add_files $MDIR_PATH/DVCon_SoC_SRC/MEMORY_IP/rom_32KB_axi/rom_32KB_axi.xci
 
 # ++ Add new Gemma3 Accelerator IP source files ++
 set ACC_IP_PATH "$MDIR_PATH/DVCon_SoC_SRC/ACC_IP_NEW"
@@ -51,9 +50,6 @@ set_property top test_bench [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]
 
 launch_simulation -simset sim_1
-# if {[file exists $MDIR_PATH/GEN_BIT_OUT/DVCon_SoC_Simulation_Waveform.wcfg]} {
-#     open_wave_config $MDIR_PATH/GEN_BIT_OUT/DVCon_SoC_Simulation_Waveform.wcfg
-# }
 
 # VCD Signal Dumping Setup
 set VCD_Dump_Suffix [clock format $today -format %H_%M]
@@ -78,10 +74,10 @@ log_vcd -level 5 /test_bench/u_Top/*
 # log_vcd /test_bench/locked_led
 # log_vcd /test_bench/proc_beat
 
-puts "VCD logging started for DVCon SoC simulation"
+puts "VCD logging started"
 
 run $SIM_RUN_TIME us
 
 close_vcd
-puts "VCD logging completed - file saved to: $MDIR_PATH/GEN_BIT_OUT/DVCon_SoC_simulation_dump.vcd"
+puts "logging completed - file saved to: $MDIR_PATH/GEN_BIT_OUT/sim_dump_$VCD_Dump_Suffix.vcd"
 
